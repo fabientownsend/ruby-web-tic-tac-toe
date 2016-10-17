@@ -1,0 +1,9 @@
+#!/usr/bin/ruby
+
+$: << File.expand_path('../lib', File.dirname(__FILE__))
+
+require "rack"
+require "rack/server"
+require "server"
+
+Rack::Handler::WEBrick.run Server.new.the_test
