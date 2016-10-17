@@ -1,21 +1,18 @@
 require 'rspec'
 require 'rack/test'
 require 'spec_helper'
+require 'server'
 
-describe 'the app' do
+RSpec.describe Server do
   include Rack::Test::Methods
 
   def app
-    Rack::Builder.new do
-      map '/' do
-        run Proc.new {|env| [200, {'Content-Type' => 'text/html'}, 'foo'] }
-      end
-    end
+    Server.new
   end
 
-  it "say foo" do
+  it "The server should answer 'hello'" do
     get '/'
-    last_response.should be_ok
-    last_response.body.should == 'foo'
+    expect(last_response).to be_ok
+    expect(last_response.body).to eq('hello')
   end
 end
