@@ -6,4 +6,4 @@ require "rack"
 require "rack/server"
 require "server"
 
-Rack::Handler::WEBrick.run Server.new.the_test
+Rack::Handler::WEBrick.run Server.new.call("adsf")
