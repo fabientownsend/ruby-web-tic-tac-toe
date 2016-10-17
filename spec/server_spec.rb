@@ -1,5 +1,6 @@
 require 'rspec'
 require 'rack/test'
+require 'spec_helper'
 
 describe 'the app' do
   include Rack::Test::Methods
