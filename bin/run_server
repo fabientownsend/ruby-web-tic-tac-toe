@@ -4,4 +4,4 @@ $: << File.expand_path('../lib', File.dirname(__FILE__))
 
 require "server"
 
-Rack::Handler::WEBrick.run Server.new.run
+Rack::Handler::WEBrick.run Server.new
