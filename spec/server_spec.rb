@@ -11,8 +11,9 @@ RSpec.describe Server do
   end
 
   it "The server should answer 'hello'" do
-    get '/'
+    get "/"
     expect(last_response).to be_ok
+    expect(last_request.url).to eq("http://example.org/")
     expect(last_response.body).to eq('hello')
   end
 end
