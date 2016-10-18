@@ -10,10 +10,18 @@ RSpec.describe Server do
     Server.new
   end
 
-  it "The server should answer 'hello'" do
+  it "display de default page" do
     get "/"
     expect(last_response).to be_ok
     expect(last_request.url).to eq("http://example.org/")
-    expect(last_response.body).to eq('hello')
+    expect(last_response.body).to eq("board")
+  end
+
+  it "recieve the value from the player" do
+    get "/move?number=asdfas"
+    expect(last_response).to be_ok
+    expect(last_request.url).to eq("http://example.org/move?number=asdfas")
+    expect(last_response.body).to eq("new board")
+    expect(last_request.env["PATH_INFO"]).to eq("/move")
   end
 end
