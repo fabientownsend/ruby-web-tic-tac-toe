@@ -43,4 +43,10 @@ RSpec.describe Server do
     get "/move?number=-10"
     expect(@helper.board_to_string).to eq("   ,   ,   ")
   end
+
+  it "switch the mark when the second player play" do
+    get "/move?number=1"
+    get "/move?number=2"
+    expect(@helper.board_to_string).to eq(" XO,   ,   ")
+  end
 end
