@@ -30,8 +30,17 @@ class Server
 
   private
 
+  def css
+    "<style>
+    body { background: #000; color: #fff; text-align: center; }
+    td { height: 100px; width: 100px; text-align: center; border: 1px solid #fff; }
+    table { border-collapse: collapse; margin: 0 auto; }
+    </style>"
+  end
+
   def html_builder(message, board)
-    "<!doctype html><html lang=''><head><meta charset='utf-8'><title></title></head><body>
+    "<!doctype html><html lang=''><head><meta charset='utf-8'><title></title>
+    #{css}</head><body>
     <h1>Tic-Tac-Toe</h1><p>#{message}</p><div id='board'>#{board}</div><form action='move'>
     <input name='number' type='number' /><input type='submit' value='Submit'/></form></body></html>"
   end
