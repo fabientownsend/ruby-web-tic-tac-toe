@@ -5,10 +5,10 @@
 
 # run the test
 ``` ruby
-$ rspec
+$ bundle exec rspec
 ```
 
 # run the server
 ``` ruby
-$ bundle exec ruby ./bin/run_server
+$ ./bin/run_server
 ```
