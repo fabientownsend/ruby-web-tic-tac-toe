@@ -44,9 +44,37 @@ RSpec.describe Server do
     expect(@helper.board_to_string).to eq("   ,   ,   ")
   end
 
-  it "switch the mark when the second player play" do
+  it "display the starting message" do
+    get "/"
+    expect(last_response.body).to include("Start game")
+  end
+
+  it "display the correct message for the current player" do
     get "/move?number=1"
+    expect(last_response.body).to include("O turn")
     get "/move?number=2"
     expect(@helper.board_to_string).to eq(" XO,   ,   ")
+  end
+
+  it "display that the game is a tie" do
+    get "/move?number=0"
+    get "/move?number=1"
+    get "/move?number=2"
+    get "/move?number=4"
+    get "/move?number=3"
+    get "/move?number=6"
+    get "/move?number=5"
+    get "/move?number=8"
+    get "/move?number=7"
+    expect(last_response.body).to include("Game Over")
+  end
+
+  it "display game over when a player win" do
+    get "/move?number=0"
+    get "/move?number=1"
+    get "/move?number=3"
+    get "/move?number=4"
+    get "/move?number=6"
+    expect(last_response.body).to include("Game Over")
   end
 end
