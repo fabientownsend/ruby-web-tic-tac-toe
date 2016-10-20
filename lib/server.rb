@@ -10,8 +10,6 @@ class Server
   end
 
   def call(env)
-    html = html_builder(@game.status, board_builder(@board.board))
-
     if (env["PATH_INFO"] == "/move")
       values = CGI.parse(env["QUERY_STRING"])
       position = values["number"].first
@@ -19,16 +17,22 @@ class Server
       @game.play(position)
 
       if !@game.over?
-        html = html_builder(@game.player_turn, board_builder(@board.board))
+        html = html_builder(player_turn, board_builder(@board.board))
       else
-        html = html_builder(@game.status, board_builder(@board.board))
+        html = html_builder("#{@game.status} - #{result_message}", board_builder(@board.board))
       end
+    else
+      html = html_builder(@game.status, board_builder(@board.board))
     end
 
     ['200', {'Content-Type' => 'text/html'}, [html]]
   end
 
   private
+
+  def player_turn
+    "#{@game.current_player} turn"
+  end
 
   def css
     "<style>
@@ -59,5 +63,17 @@ class Server
     end
 
     html_board += "</tbody></table>"
+  end
+
+  def result_message
+    message = ""
+
+    if @game.winner.empty?
+      message += "It's a tie"
+    else
+      message += "The winner is #{@game.winner}"
+    end
+
+    message
   end
 end
