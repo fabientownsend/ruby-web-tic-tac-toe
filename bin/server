@@ -1,8 +1,5 @@
 $: << File.expand_path('../lib', File.dirname(__FILE__))
 
 require "server"
-require "board"
 
-board = Board.new
-
-Rack::Handler::WEBrick.run Server.new(board)
+Rack::Handler::WEBrick.run Server.new

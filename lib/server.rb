@@ -4,9 +4,9 @@ require 'cgi'
 require 'game'
 
 class Server
-  def initialize(board)
-    @board = board
-    @game = Game.new(board)
+  def initialize
+    @board = Board.new
+    @game = Game.new(@board)
   end
 
   def call(env)
