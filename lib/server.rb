@@ -1,7 +1,7 @@
-require "rack"
-require "board"
-require "cgi"
-require "game"
+require 'rack'
+require 'board'
+require 'cgi'
+require 'game'
 
 class Server
   def initialize(board)
@@ -19,10 +19,10 @@ class Server
       if !@game.over?
         html = html_builder(player_turn, board_builder(@board.board))
       else
-        html = html_builder("#{@game.status} - #{result_message}", board_builder(@board.board))
+        html = html_builder("Game Over - #{result_message}", board_builder(@board.board))
       end
     else
-      html = html_builder(@game.status, board_builder(@board.board))
+      html = html_builder("Start game", board_builder(@board.board))
     end
 
     ['200', {'Content-Type' => 'text/html'}, [html]]

@@ -57,24 +57,18 @@ RSpec.describe Server do
   end
 
   it "display that the game is a tie" do
-    get "/move?number=0"
-    get "/move?number=1"
-    get "/move?number=2"
-    get "/move?number=4"
-    get "/move?number=3"
-    get "/move?number=6"
-    get "/move?number=5"
-    get "/move?number=8"
-    get "/move?number=7"
+    execute_moves([0, 1, 2, 4, 3, 6, 5, 8, 7])
     expect(last_response.body).to include("Game Over")
   end
 
   it "display game over when a player win" do
-    get "/move?number=0"
-    get "/move?number=1"
-    get "/move?number=3"
-    get "/move?number=4"
-    get "/move?number=6"
+    execute_moves([0, 1, 3, 4, 6])
     expect(last_response.body).to include("Game Over")
+  end
+
+  private
+
+  def execute_moves(moves)
+    moves.each { |move| get "/move?number=#{move}" }
   end
 end

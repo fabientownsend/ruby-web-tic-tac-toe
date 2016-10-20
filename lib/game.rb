@@ -1,3 +1,5 @@
+require 'marks'
+
 class Game
   attr_reader :status
   attr_reader :current_player
@@ -5,7 +7,6 @@ class Game
 
   def initialize(board)
     @board = board
-    @status = "Start game"
     @players = [Mark::CROSS, Mark::ROUND]
     @current_player = @players.first
     @winner = ""
@@ -15,12 +16,7 @@ class Game
     if (is_valid?(position))
       @board.set_mark(@current_player, Integer(position))
 
-      if (over?)
-        @status = "Game Over"
-        if !@board.tie?
-          @winner = @current_player
-        end
-      else
+      if (!over?)
         switch_players
       end
     end
@@ -28,6 +24,14 @@ class Game
 
   def over?
     @board.win?(@current_player) || @board.tie?
+  end
+
+  def winner
+    if (!@board.tie?)
+      @winner = @current_player
+    else
+      @winner
+    end
   end
 
   private

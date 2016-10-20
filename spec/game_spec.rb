@@ -1,72 +1,74 @@
 require 'board'
 require 'game'
+require 'marks'
 
 RSpec.describe Game do
   let (:board) { Board.new }
   let (:game) { Game.new(board) }
-
-  it "return the game status" do
-    expect(game.status).to eq("Start game")
-  end
+  let(:board_helper) { BoardHelper.new(board) }
 
   it "return the current player" do
-    expect(game.current_player).to eq("X")
+    expect(game.current_player).to eq(Mark::CROSS)
   end
 
-  it "change the player after a move" do
-    execute_moves([0])
-    expect(game.current_player).to eq("O")
+  it "return the current player after the first player played" do
+    game.play(0)
+    expect(game.current_player).to eq(Mark::ROUND)
   end
 
-  it "also work when then integer is a char" do
-    execute_moves(["0"])
-    expect(game.current_player).to eq("O")
+  it "work with an Integer as char" do
+    game.play("0")
+    expect(game.current_player).to eq(Mark::ROUND)
   end
 
-  it "get back the same player after two move" do
+  it "get back the first player after the second one played" do
     execute_moves([0, 1])
-    expect(game.current_player).to eq("X")
+    expect(game.current_player).to eq(Mark::CROSS)
   end
 
-  it "doesn't switch player when he plays an occupied position" do
+  it "doesn't switch player when the move isn't available" do
     execute_moves([0, 0])
-    expect(game.current_player).to eq("O")
+    expect(game.current_player).to eq(Mark::ROUND)
   end
 
-  it "doesn't change the player when the value is a text" do
+  it "doesn't change the player when the move is text" do
     game.play("asdffda")
-    expect(game.current_player).to eq("X")
+    expect(game.current_player).to eq(Mark::CROSS)
   end
 
   it "doesn't change the player when the value is a under the board limit" do
     game.play(board.POSITION_MIN - 1)
-    expect(game.current_player).to eq("X")
+    expect(game.current_player).to eq(Mark::CROSS)
   end
 
   it "doesn't change the player when the value is a under the board limit" do
     game.play(board.POSITION_MAX + 1)
-    expect(game.current_player).to eq("X")
+    expect(game.current_player).to eq(Mark::CROSS)
+  end
+
+  it "return the game status" do
+    expect(game.over?).to be false
   end
 
   it "return game status game over when it's a tie" do
-    execute_moves([0, 1, 2, 4, 3, 6, 5, 8, 7])
-    expect(game.status).to eq("Game Over")
-  end
-
-  it "doesn't have a winner when it's a tie" do
-    execute_moves([0, 1, 2, 4, 3, 6, 5, 8, 7])
-    expect(game.winner.empty?).to be true
+    board_helper.string_to_board("XOX,XOX,OXO")
+    expect(game.over?).to be true
   end
 
   it "return game status game over when it's a win" do
-    execute_moves([0, 1, 3, 4, 6])
-    expect(game.status).to eq("Game Over")
+    board_helper.string_to_board("XO ,XO ,X  ")
+    expect(game.over?).to be true
+  end
+
+  it "doesn't have a winner when it's a tie" do
+    board_helper.string_to_board("XOX,XOX,OXO")
+    expect(game.winner.empty?).to be true
   end
 
   it "return the winner when a player won" do
-    execute_moves([0, 1, 3, 4, 6])
+    board_helper.string_to_board("XO ,XO ,X  ")
     expect(game.winner.empty?).to be false
-    expect(game.winner).to eq("X")
+    expect(game.winner).to eq(Mark::CROSS)
   end
 
   private
