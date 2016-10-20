@@ -14,36 +14,43 @@ RSpec.describe Game do
   it "return the current player after the first player played" do
     game.play(0)
     expect(game.current_player).to eq(Mark::ROUND)
+    expect(board_helper.board_to_string).to eq("X  ,   ,   ")
   end
 
   it "work with an Integer as char" do
     game.play("0")
     expect(game.current_player).to eq(Mark::ROUND)
+    expect(board_helper.board_to_string).to eq("X  ,   ,   ")
   end
 
   it "get back the first player after the second one played" do
     execute_moves([0, 1])
     expect(game.current_player).to eq(Mark::CROSS)
+    expect(board_helper.board_to_string).to eq("XO ,   ,   ")
   end
 
   it "doesn't switch player when the move isn't available" do
     execute_moves([0, 0])
     expect(game.current_player).to eq(Mark::ROUND)
+    expect(board_helper.board_to_string).to eq("X  ,   ,   ")
   end
 
   it "doesn't change the player when the move is text" do
     game.play("asdffda")
     expect(game.current_player).to eq(Mark::CROSS)
+    expect(board_helper.board_to_string).to eq("   ,   ,   ")
   end
 
   it "doesn't change the player when the value is a under the board limit" do
     game.play(board.POSITION_MIN - 1)
     expect(game.current_player).to eq(Mark::CROSS)
+    expect(board_helper.board_to_string).to eq("   ,   ,   ")
   end
 
   it "doesn't change the player when the value is a under the board limit" do
     game.play(board.POSITION_MAX + 1)
     expect(game.current_player).to eq(Mark::CROSS)
+    expect(board_helper.board_to_string).to eq("   ,   ,   ")
   end
 
   it "return the game status" do

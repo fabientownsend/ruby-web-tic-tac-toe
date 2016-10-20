@@ -17,26 +17,6 @@ class BoardHelper
     end
   end
 
-  def self.board_to_s(board)
-    board_string = ""
-
-    board.flatten.each.with_index do |value, index|
-      if !value.is_a?(Integer)
-        board_string << value
-      else
-        board_string << " "
-      end
-
-      index += 1
-      if  board_edge?(index) && index != @board.POSITION_MAX
-        board_string << ","
-      end
-
-    end
-
-    board_string
-  end
-
   def board_to_string
     board_string = ""
 
