@@ -16,11 +16,7 @@ class Server
     elsif (env["PATH_INFO"] == "/move")
       @game.play(position(env))
 
-      if (!@game.over?)
-        html = HTMLBuilder.generate_page(generate_message, HTMLBuilder.board(@board.board))
-      else
-        html = HTMLBuilder.generate_page(generate_message, HTMLBuilder.board(@board.board))
-      end
+      html = HTMLBuilder.generate_page(generate_message, HTMLBuilder.board(@board.board))
     else
         html = HTMLBuilder.generate_page("Are you lost?", HTMLBuilder.board(@board.board))
     end
@@ -37,7 +33,7 @@ class Server
       message += "Game Over - It's a tie"
     elsif (@game.over?)
       message += "Game Over - The winner is #{@game.winner}"
-    elsif (!@game.over?)
+    else
       message += "#{@game.current_player} turn"
     end
 
