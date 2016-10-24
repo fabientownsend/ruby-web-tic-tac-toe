@@ -3,18 +3,24 @@ require 'cgi'
 require 'game'
 require 'rack'
 require 'html_builder'
+require 'web_player'
 
 class Server
   def initialize
-    start_new_game
+    @board = Board.new
+    @web_player = WebPlayer.new(Mark::CROSS)
+    @game = Game.new(@web_player, @board)
   end
 
   def call(env)
     if (env["PATH_INFO"] == "/" || env["PATH_INFO"] == "/reset")
-      start_new_game
+      initialize
       html = HTMLBuilder.generate_page("Start game", HTMLBuilder.board(@board.board))
     elsif (env["PATH_INFO"] == "/move")
-      @game.play(position(env))
+
+      @web_player.next_move = position(env)
+
+      @game.play
 
       html = HTMLBuilder.generate_page(generate_message, HTMLBuilder.board(@board.board))
     else
@@ -38,11 +44,6 @@ class Server
     end
 
     message
-  end
-
-  def start_new_game
-    @board = Board.new
-    @game = Game.new(@board)
   end
 
   def position(env)
