@@ -4,6 +4,6 @@ require 'rack'
 require 'server'
 
 Rack::Handler::WEBrick.run(
-  Server.new,
+  Server.new(true),
   :Port => 9000
 )
