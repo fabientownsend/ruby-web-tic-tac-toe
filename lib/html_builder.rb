@@ -1,5 +1,24 @@
 class HTMLBuilder
-  def self.board(board)
+  attr_accessor :message
+
+  def initialize(board)
+    @the_board = board
+  end
+
+  def generate
+    generate_pagee
+  end
+
+  private
+
+  def generate_pagee
+    "<!doctype html><html lang=''><head><meta charset='utf-8'><title></title>
+    #{css}</head><body>
+    <h1>Tic-Tac-Toe</h1><p>#{message}</p><div id='board'>#{deserialize_board(@the_board)}</div>
+    <form action='reset'><input type='submit' value='Reset'/></form></body></html>"
+  end
+
+  def deserialize_board(board)
     html_board = "<table><tbody>"
 
     board.each do |line|
@@ -15,18 +34,7 @@ class HTMLBuilder
     html_board += "</tbody></table>"
   end
 
-  def self.generate_page(message, board)
-    "<!doctype html><html lang=''><head><meta charset='utf-8'><title></title>
-    #{css}</head><body>
-    <h1>Tic-Tac-Toe</h1><p>#{message}</p><div id='board'>#{board}</div>
-    <form action='reset'><input type='submit' value='Reset'/></form></body></html>"
-  end
-
-  private
-
-  attr_accessor :board
-
-  def self.css
+  def css
     "<style>
     body { background: #000; color: #fff; text-align: center; }
     td { height: 100px; width: 100px; text-align: center; border: 1px solid #fff; }

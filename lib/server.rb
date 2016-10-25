@@ -21,6 +21,8 @@ class Server
     end
 
     @game = Game.new(@board, @web_player_one, @we_player_two)
+
+    @html_page = HTMLBuilder.new(@board.board)
   end
 
   def call(env)
@@ -30,6 +32,7 @@ class Server
     if (path == "/" || path == "/reset")
       initialize(@vs_computer)
     elsif (path == "/move")
+
       begin
         @game.play
       rescue
@@ -41,10 +44,11 @@ class Server
         rescue
         end
       end
+
     end
 
-    html = HTMLBuilder.generate_page(generate_message(path), HTMLBuilder.board(@board.board))
-    ['200', {'Content-Type' => 'text/html'}, [html]]
+    @html_page.message = generate_message(path)
+    ['200', {'Content-Type' => 'text/html'}, [@html_page.generate]]
   end
 
   private
