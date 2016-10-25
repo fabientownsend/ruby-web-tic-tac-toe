@@ -8,8 +8,9 @@ require 'web_player'
 class Server
   def initialize
     @board = Board.new
-    @web_player = WebPlayer.new(Mark::CROSS)
-    @game = Game.new(@web_player, @board)
+    @web_player_one = WebPlayer.new(Mark::CROSS)
+    @we_player_two = WebPlayer.new(Mark::ROUND)
+    @game = Game.new(@board, @web_player_one, @we_player_two)
   end
 
   def call(env)
@@ -18,11 +19,12 @@ class Server
       html = HTMLBuilder.generate_page("Start game", HTMLBuilder.board(@board.board))
     elsif (env["PATH_INFO"] == "/move")
 
-      @web_player.next_move = position(env)
+      @web_player_one.next_move = position(env)
+      @we_player_two.next_move = position(env)
 
       @game.play
 
-      html = HTMLBuilder.generate_page(generate_message, HTMLBuilder.board(@board.board))
+     html = HTMLBuilder.generate_page(generate_message, HTMLBuilder.board(@board.board))
     else
         html = HTMLBuilder.generate_page("Are you lost?", HTMLBuilder.board(@board.board))
     end
@@ -40,7 +42,7 @@ class Server
     elsif (@game.over?)
       message += "Game Over - The winner is #{@game.winner}"
     else
-      message += "#{@game.current_player} turn"
+      message += "#{@game.current_player.mark} turn"
     end
 
     message
