@@ -10,5 +10,5 @@ $ bundle exec rspec
 
 # run the server
 ``` ruby
-$ ./bin/run_server
+$ bundle exec rackup
 ```

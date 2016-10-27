@@ -3,6 +3,7 @@ require 'rack/test'
 require 'rspec'
 require 'server'
 require 'spec_helper'
+require 'web_player'
 
 RSpec.describe Server do
   include Rack::Test::Methods
