@@ -30,10 +30,16 @@ class Server
     if (path == "/" || path == "/reset")
       initialize(@vs_computer)
     elsif (path == "/move")
-      @game.play
-
-      if (@vs_computer)
+      begin
         @game.play
+      rescue
+      end
+
+      begin
+        if (@vs_computer)
+          @game.play
+        end
+      rescue
       end
     end
 
