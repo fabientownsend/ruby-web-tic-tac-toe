@@ -7,16 +7,21 @@ class WebPlayer
   def initialize(mark, app)
     @app = app
     @mark = mark
-    @ready = true
+    @ready = false
   end
 
   def next_move
     position(@app.env)
+    @ready = false
+    @move
   end
 
   def position(env)
     values = CGI.parse(env["QUERY_STRING"])
-    values["number"].first
+    if (@move != values["number"].first)
+      @move = values["number"].first
+      @ready = true
+    end
   end
 end
 
