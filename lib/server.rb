@@ -31,22 +31,25 @@ class Server
 
     if (path == "/" || path == "/reset")
       initialize(@vs_computer)
+      @html.game_types("human_vs_human")
     elsif (path == "/menu")
       values = CGI.parse(env["QUERY_STRING"])
       type_game = values["menu"].first
 
-      if (type_game == "human")
+      if (type_game == "human_vs_human")
         initialize(false)
-      elsif (type_game == "computer")
+        @html.game_types("human_vs_human")
+      elsif (type_game == "human_vs_computer")
         initialize(true)
-      elsif (type_game == "computervscomputer")
+        @html.game_types("human_vs_computer")
+      elsif (type_game == "computer_vs_computer")
         initialize(true)
+        @html.game_types("computer_vs_computer")
       end
     elsif (path == "/move")
       play
     end
 
-    @html.the_mess(generate_message(path))
     @html.message = generate_message(path)
     @html.the_test(@board.board)
     ['200', {'Content-Type' => 'text/html'}, [@html.generate_page]]

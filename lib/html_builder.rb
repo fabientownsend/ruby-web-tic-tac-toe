@@ -1,5 +1,6 @@
 class HTMLBuilder
   attr_accessor :message
+
   def the_test(board)
     @my_board = "<table><tbody>"
 
@@ -19,17 +20,34 @@ class HTMLBuilder
   def generate_page
     "<!doctype html><html lang=''><head><meta charset='utf-8'><title></title>
     #{css}</head><body>
-    <form action='menu'><select name='menu'>
-    <option value='human'>Human vs. Human</option>
-    <option value='computer'>Human vs. Computer</option>
-    </select><input type='submit' value='type game'/></form>
+    #{@list_game_types}
     <h1>Tic-Tac-Toe</h1><p>#{message}</p><div id='board'>#{@my_board}</div>
     <form action='reset'><input type='submit' value='Reset'/></form></body></html>"
+  end
+
+  def game_types(type = nil)
+    @list_game_types = "<form action='menu'><select name='menu'>"
+
+    TYPES.each do |value, menu|
+      if (type == value)
+        @list_game_types += "<option value='#{value}' selected='selected'>#{menu}</option>"
+      else
+        @list_game_types += "<option value='#{value}'>#{menu}</option>"
+      end
+    end
+
+    @list_game_types += "</select><input type='submit' value='type game'/></form>"
   end
 
   private
 
   attr_accessor :board
+
+  TYPES = {
+    "human_vs_human" => "Human vs. Human",
+    "human_vs_computer" => "Human vs. Computer",
+    "computer_vs_computer" => "Computer vs. Computer"
+  }
 
   def css
     "<style>
