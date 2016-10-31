@@ -11,17 +11,17 @@ class WebPlayer
   end
 
   def next_move
-    position(@app.env)
     @ready = false
-    @move
+    get_move
   end
 
-  def position(env)
-    values = CGI.parse(env["QUERY_STRING"])
-    if (@move != values["number"].first)
-      @move = values["number"].first
-      @ready = true
-    end
+  def new_move?
+    @ready = true if @move != get_move
+  end
+
+  def get_move
+    values = CGI.parse(@app.env["QUERY_STRING"])
+    values["number"].first
   end
 end
 

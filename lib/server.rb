@@ -31,14 +31,9 @@ class Server
     if (path == "/" || path == "/reset")
       initialize(@vs_computer)
     elsif (path == "/move")
-      begin
-        @game.current_player.position(env)
-        @game.play
-      rescue
-      end
+      play
     end
 
-    # display the page
     html = HTMLBuilder.generate_page(generate_message(path), HTMLBuilder.board(@board.board))
     ['200', {'Content-Type' => 'text/html'}, [html]]
   end
@@ -49,13 +44,7 @@ class Server
     message = ""
 
     if (path == "/move")
-      if (@game.over? && @game.winner.empty?)
-        message += "Game Over - It's a tie"
-      elsif (@game.over?)
-        message += "Game Over - The winner is #{@game.winner}"
-      else
-        message += "#{@game.current_player.mark} turn"
-      end
+      message += message_move
     elsif (path == "/" || path == "/reset")
       message += "Start game"
     else
@@ -65,8 +54,21 @@ class Server
     message
   end
 
-  def position(env)
-    values = CGI.parse(env["QUERY_STRING"])
-    values["number"].first
+  def message_move
+    if (@game.over? && @game.winner.empty?)
+      "Game Over - It's a tie"
+    elsif (@game.over?)
+      "Game Over - The winner is #{@game.winner}"
+    else
+      "#{@game.current_player.mark} turn"
+    end
+  end
+
+  def play
+    begin
+      @game.current_player.new_move?
+      @game.play
+    rescue
+    end
   end
 end
