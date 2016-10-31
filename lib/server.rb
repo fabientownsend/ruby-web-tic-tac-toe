@@ -44,7 +44,12 @@ class Server
         @html.game_types("human_vs_computer")
       elsif (type_game == "computer_vs_computer")
         initialize(true)
+      @board = Board.new
+        @web_player_one = Computer.new(Mark::CROSS, @board)
+        @web_player_two = Computer.new(Mark::ROUND, @board)
+        @game = Game.new(@board, @web_player_one, @web_player_two)
         @html.game_types("computer_vs_computer")
+        @game.play
       end
     elsif (path == "/move")
       play
