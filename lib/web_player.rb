@@ -24,4 +24,3 @@ class WebPlayer
     values["number"].first
   end
 end
-

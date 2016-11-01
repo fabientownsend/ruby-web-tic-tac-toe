@@ -1,7 +1,7 @@
 class HTMLBuilder
   attr_accessor :message
 
-  def the_test(board)
+  def generate_board(board)
     @my_board = "<table><tbody>"
 
     board.each do |line|

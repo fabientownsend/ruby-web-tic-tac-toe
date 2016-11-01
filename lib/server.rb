@@ -6,90 +6,104 @@ require 'html_builder'
 require 'rack'
 require 'web_player'
 
+class GameBuilder
+end
+
+module GAME_TYPES
+  HUMAN_VS_HUMAN = "HUman_vs_human"
+  HUMAN_VS_COMPUTER = "human_vs_computer"
+  COMPUTER_VS_COMPUTER = "computer_vs_computer"
+end
+
 class Server
   attr_reader :env
 
   def initialize(computer = false)
-    @board = Board.new
-    @web_player_one = WebPlayer.new(Mark::CROSS, self)
-    @vs_computer = computer
-
-    if (@vs_computer)
-      @web_player_two = Computer.new(Mark::ROUND, @board)
-    else
-      @web_player_two = WebPlayer.new(Mark::ROUND, self)
-    end
-
-    @game = Game.new(@board, @web_player_one, @web_player_two)
     @html = HTMLBuilder.new
+    @type_game = GAME_TYPES::HUMAN_VS_HUMAN
+    create_game(@type_game)
+    @html.game_types(@type_game)
   end
 
   def call(env)
     @env = env
-
     path = env["PATH_INFO"]
 
     if (path == "/" || path == "/reset")
-      initialize(@vs_computer)
-      @html.game_types("human_vs_human")
+      start_game
     elsif (path == "/menu")
-      values = CGI.parse(env["QUERY_STRING"])
-      type_game = values["menu"].first
+      @type_game = parse_type_game(env)
 
-      if (type_game == "human_vs_human")
-        initialize(false)
-        @html.game_types("human_vs_human")
-      elsif (type_game == "human_vs_computer")
-        initialize(true)
-        @html.game_types("human_vs_computer")
-      elsif (type_game == "computer_vs_computer")
-        initialize(true)
-      @board = Board.new
-        @web_player_one = Computer.new(Mark::CROSS, @board)
-        @web_player_two = Computer.new(Mark::ROUND, @board)
-        @game = Game.new(@board, @web_player_one, @web_player_two)
-        @html.game_types("computer_vs_computer")
-        @game.play
-      end
+      start_game
+
+      @game.play if @type_game == GAME_TYPES::COMPUTER_VS_COMPUTER
     elsif (path == "/move")
       play
     end
 
-    @html.message = generate_message(path)
-    @html.the_test(@board.board)
+    @html.generate_board(@board.board)
+    @html.message = message(path)
     ['200', {'Content-Type' => 'text/html'}, [@html.generate_page]]
   end
 
   private
 
-  def generate_message(path)
-    message = ""
-
-    if (path == "/move")
-      message += message_move
-    elsif (path == "/" || path == "/reset")
-      message += "Start game"
-    else
-      message += "Are you lost?"
-    end
-
-    message
+  def start_game
+    create_game(@type_game)
+    @html.game_types(@type_game)
   end
 
-  def message_move
-    if (@game.over? && @game.winner.empty?)
-      "Game Over - It's a tie"
-    elsif (@game.over?)
-      "Game Over - The winner is #{@game.winner}"
+  def create_game(type_game)
+    @board = Board.new
+
+    if (type_game == GAME_TYPES::HUMAN_VS_COMPUTER)
+      players = create_human_and_computer_players
+    elsif (type_game == GAME_TYPES::COMPUTER_VS_COMPUTER)
+      players = create_computer_players
     else
-      "#{@game.current_player.mark} turn"
+      players = create_human_players
     end
+
+    @game = Game.new(@board, players.player_one, players.player_two)
+  end
+
+
+  Players = Struct.new(:player_one, :player_two)
+  def create_human_players
+    Players.new(WebPlayer.new(Mark::CROSS, self), WebPlayer.new(Mark::ROUND, self))
+  end
+
+  def create_human_and_computer_players
+    Players.new(WebPlayer.new(Mark::CROSS, self), Computer.new(Mark::ROUND, @board))
+  end
+
+  def create_computer_players
+    Players.new(Computer.new(Mark::CROSS, @board), Computer.new(Mark::ROUND, @board))
+  end
+
+  def parse_type_game(env)
+    values = CGI.parse(env["QUERY_STRING"])
+    values["menu"].first
+  end
+
+  def message(path)
+    return game_status if (path == "/move")
+    return "Start game" if (path == "/" || path == "/reset")
+    return  "Are you lost?"
+  end
+
+  def game_status
+    return "Game Over - It's a tie" if (@game.over? && @game.winner.empty?)
+    return "Game Over - The winner is #{@game.winner}" if (@game.over?)
+    return "#{@game.current_player.mark} turn"
   end
 
   def play
     begin
       @game.current_player.new_move?
       @game.play
+    rescue OccupiedPositionError
+      @html.message = "Occupied spot"
     rescue
     end
   end
