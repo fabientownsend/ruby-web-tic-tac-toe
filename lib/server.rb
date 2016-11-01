@@ -18,7 +18,7 @@ end
 class Server
   attr_reader :env
 
-  def initialize(computer = false)
+  def initialize
     @html = HTMLBuilder.new
     @type_game = GAME_TYPES::HUMAN_VS_HUMAN
     create_game(@type_game)
