@@ -40,6 +40,22 @@ RSpec.describe Server do
     expect(last_response.body).to include("X")
   end
 
+  it "it display the game type you playing" do
+    get "/menu?menu=human_vs_computer"
+    expect(last_response.body).to include("value='human_vs_computer' selected='selected'")
+  end
+
+  it "reset keep the last game type played" do
+    get "/menu?menu=human_vs_computer"
+    get "/reset"
+    expect(last_response.body).to include("value='human_vs_computer' selected='selected'")
+  end
+
+  it "computer vs computer always finish with a tie" do
+    get "/menu?menu=computer_vs_computer"
+    expect(last_response.body).to include("It's a tie")
+  end
+
   it "display that the game is a tie" do
     execute_moves([0, 1, 2, 4, 3, 6, 5, 8, 7])
     expect(last_response.body).to include("Game Over")
