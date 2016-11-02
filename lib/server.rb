@@ -20,25 +20,30 @@ class Server
     path = env["PATH_INFO"]
 
     if (path == "/" || path == "/reset")
-      start_game
+      start_new_game
+      @html.generate_board(@board.content)
+      @html.message = message(path)
     elsif (path == "/menu")
       @type_game = parse_type_game(env)
 
-      start_game
-
-      @game.play if @type_game == GAME_TYPES::COMPUTER_VS_COMPUTER
+      start_new_game
+      @html.generate_board(@board.content)
+      @html.message = message(path)
     elsif (path == "/move")
       play
+      @html.generate_board(@board.content)
+      @html.message = message(path)
+    else
+      @html.generate_board(@board.content)
+      @html.message = message(path)
     end
 
-    @html.generate_board(@board.board)
-    @html.message = message(path)
     ['200', {'Content-Type' => 'text/html'}, [@html.generate_page]]
   end
 
   private
 
-  def start_game
+  def start_new_game
     create_game(@type_game)
     @html.game_types(@type_game)
     @game.play if @type_game == GAME_TYPES::COMPUTER_VS_COMPUTER
@@ -50,10 +55,14 @@ class Server
     @game = Game.new(@board, players.player_one, players.player_two)
   end
 
-
-  Players = Struct.new(:player_one, :player_two)
-  def create_human_players
-    Players.new(WebPlayer.new(Mark::CROSS, self), WebPlayer.new(Mark::ROUND, self))
+  def play
+    begin
+      @game.current_player.new_move?
+      @game.play
+    rescue OccupiedPositionError
+      @html.message = "Occupied spot"
+    rescue
+    end
   end
 
   def create_players(type_game)
@@ -79,15 +88,5 @@ class Server
     return "Game Over - It's a tie" if (@game.over? && @game.winner.empty?)
     return "Game Over - The winner is #{@game.winner}" if (@game.over?)
     return "#{@game.current_player.mark} turn"
-  end
-
-  def play
-    begin
-      @game.current_player.new_move?
-      @game.play
-    rescue OccupiedPositionError
-      @html.message = "Occupied spot"
-    rescue
-    end
   end
 end
