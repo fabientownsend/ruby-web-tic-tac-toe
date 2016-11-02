@@ -70,7 +70,7 @@ class Server
   end
 
   def message(path)
-    return game_status if (path == "/move")
+    return game_status if (path == "/move") || (path == "/menu")
     return "Start game" if (path == "/" || path == "/reset")
     return  "Are you lost?"
   end
