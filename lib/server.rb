@@ -1,19 +1,10 @@
 require 'board'
 require 'cgi'
-require 'computer'
 require 'game'
 require 'html_builder'
 require 'rack'
-require 'web_player'
-
-class GameBuilder
-end
-
-module GAME_TYPES
-  HUMAN_VS_HUMAN = "HUman_vs_human"
-  HUMAN_VS_COMPUTER = "human_vs_computer"
-  COMPUTER_VS_COMPUTER = "computer_vs_computer"
-end
+require 'players_factory'
+require 'game_types'
 
 class Server
   attr_reader :env
@@ -21,8 +12,7 @@ class Server
   def initialize
     @html = HTMLBuilder.new
     @type_game = GAME_TYPES::HUMAN_VS_HUMAN
-    create_game(@type_game)
-    @html.game_types(@type_game)
+    start_new_game
   end
 
   def call(env)
@@ -51,19 +41,12 @@ class Server
   def start_game
     create_game(@type_game)
     @html.game_types(@type_game)
+    @game.play if @type_game == GAME_TYPES::COMPUTER_VS_COMPUTER
   end
 
   def create_game(type_game)
     @board = Board.new
-
-    if (type_game == GAME_TYPES::HUMAN_VS_COMPUTER)
-      players = create_human_and_computer_players
-    elsif (type_game == GAME_TYPES::COMPUTER_VS_COMPUTER)
-      players = create_computer_players
-    else
-      players = create_human_players
-    end
-
+    players = create_players(type_game)
     @game = Game.new(@board, players.player_one, players.player_two)
   end
 
@@ -73,12 +56,12 @@ class Server
     Players.new(WebPlayer.new(Mark::CROSS, self), WebPlayer.new(Mark::ROUND, self))
   end
 
-  def create_human_and_computer_players
-    Players.new(WebPlayer.new(Mark::CROSS, self), Computer.new(Mark::ROUND, @board))
-  end
+  def create_players(type_game)
+    factory = PlayersFactory.new(@board, self)
 
-  def create_computer_players
-    Players.new(Computer.new(Mark::CROSS, @board), Computer.new(Mark::ROUND, @board))
+    return factory.create_human_and_computer_players if (type_game == GAME_TYPES::HUMAN_VS_COMPUTER)
+    return factory.create_computer_players if (type_game == GAME_TYPES::COMPUTER_VS_COMPUTER)
+    return factory.create_human_players
   end
 
   def parse_type_game(env)
