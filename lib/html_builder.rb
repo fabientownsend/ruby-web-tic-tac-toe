@@ -25,7 +25,7 @@ class HTMLBuilder
     <form action='reset'><input type='submit' value='Reset'/></form></body></html>"
   end
 
-  def game_types(type = nil)
+  def game_types(type = "human_vs_computer")
     @list_game_types = "<form action='menu'><select name='menu'>"
 
     TYPES.each do |value, menu|
