@@ -16,6 +16,7 @@ RSpec.describe Server do
     get "/"
     expect(last_response.body).to include("value='human_vs_computer'")
   end
+
   it"start with a new game on the default page" do
     get "/"
     expect(last_response).to be_ok
@@ -23,6 +24,12 @@ RSpec.describe Server do
     expect(last_response.body).to include("Start game")
     expect(last_response.body).not_to include("X")
     expect(last_response.body).not_to include("O")
+  end
+
+  it"display the board" do
+    get "/"
+    expect(last_response.body).to include("<table>")
+    expect(last_response.body).to include("</table>")
   end
 
   it"restart the game when the game is reset" do
