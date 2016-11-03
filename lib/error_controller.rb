@@ -1,5 +1,5 @@
   class ErrorController
-    def initialize(one, two, three, html)
+    def update(one, two, three, html)
       @game = three
     end
 

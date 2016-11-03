@@ -1,29 +1,33 @@
   class GamePlayController
-    require 'html_builder'
 
-    def initialize(board, useless, game, html)
+    def initialize(game_creator, board, html)
+      @game_creator = game_creator
+      @game = game_creator.game
       @board = board
-      @game = game
       @html = html
     end
 
     def action(env)
-      @game.current_player.new_move?
-      @game.play
-      return @game
+      @game = @game_creator.game
+      game.current_player.new_move?
+      game.play
     end
 
     def response
-      @html.generate_board(@board.content)
-      @html.message = game_status
-      @html.generate_page
+      html.generate_board(board.content)
+      html.message = game_status
+      html.generate_page
     end
 
     private
 
+    attr_accessor :html
+    attr_reader :board
+    attr_reader :game
+
     def game_status
-      return "Game Over - It's a tie" if (@game.over? && @game.winner.empty?)
-      return "Game Over - The winner is #{@game.winner}" if (@game.over?)
-      return "#{@game.current_player.mark} turn"
+      return "Game Over - It's a tie" if (game.over? && game.winner.empty?)
+      return "Game Over - The winner is #{game.winner}" if (game.over?)
+      return "#{game.current_player.mark} turn"
     end
   end

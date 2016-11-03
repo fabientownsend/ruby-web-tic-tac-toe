@@ -53,8 +53,7 @@ RSpec.describe Server do
   it"reset keep the last game type played" do
     get "/menu?menu=human_vs_computer"
     get "/reset"
-    # still have to decide about the behavior of the game with this point
-    #expect(last_response.body).to include("value='human_vs_computer' selected='selected'")
+    expect(last_response.body).to include("value='human_vs_computer' selected='selected'")
   end
 
   it"computer vs computer always finish with a tie" do

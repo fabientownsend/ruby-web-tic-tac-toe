@@ -3,39 +3,43 @@ require 'game'
 require 'cgi'
 
 class GameCreationController
-  require 'html_builder'
-  require 'board'
-  require 'players_factory'
 
-  def initialize(board, event, useless, html)
-    @html = html
-    @type_game = ""
-    @board = board
+  attr_reader :game
+
+  def initialize(event, board, html)
     @event = event
+    @board = board
+    @html = html
+    @type_game = GAME_TYPES::HUMAN_VS_HUMAN
+
+    create_game(@type_game)
   end
 
   def action(env)
-    @type_game = parse_type_game(env)
-
+    board.reset
+    @type_game = parse_type_game(env) if parse_type_game(env) != nil
     create_game(@type_game)
     @game.play if @type_game == GAME_TYPES::COMPUTER_VS_COMPUTER
-    return @game
   end
 
   def response
-    @html.game_types(@type_game)
-    @html.generate_board(@board.content)
-    @html.message = "Start game"
-    @html.message = game_status if @type_game == GAME_TYPES::COMPUTER_VS_COMPUTER
-    @html.generate_page
+    html.game_types(@type_game)
+    html.generate_board(board.content)
+    html.message = "Start game"
+    html.message = game_status if @type_game == GAME_TYPES::COMPUTER_VS_COMPUTER
+    html.generate_page
   end
 
   private
 
+  attr_reader :event
+  attr_accessor :html
+  attr_accessor :board
+
   def game_status
-    return "Game Over - It's a tie" if (@game.over? && @game.winner.empty?)
-    return "Game Over - The winner is #{@game.winner}" if (@game.over?)
-    return "#{@game.current_player.mark} turn"
+    return "Game Over - It's a tie" if (game.over? && game.winner.empty?)
+    return "Game Over - The winner is #{game.winner}" if (game.over?)
+    return "#{game.current_player.mark} turn"
   end
 
   def parse_type_game(env)
@@ -45,11 +49,11 @@ class GameCreationController
 
   def create_game(type_game)
     players = create_players(type_game)
-    @game = Game.new(@board, players.player_one, players.player_two)
+    @game = Game.new(board, players.player_one, players.player_two)
   end
 
   def create_players(type_game)
-    factory = PlayersFactory.new(@board, @event)
+    factory = PlayersFactory.new(board, event)
 
     return factory.create_human_and_computer_players if (type_game == GAME_TYPES::HUMAN_VS_COMPUTER)
     return factory.create_computer_players if (type_game == GAME_TYPES::COMPUTER_VS_COMPUTER)
