@@ -49,7 +49,10 @@ class GameCreationController
 
   def create_game(type_game)
     players = create_players(type_game)
-    @game = Game.new(board, players.player_one, players.player_two)
+    @game = Game.new(
+      :board => board,
+      :player_one => players.player_one,
+      :player_two => players.player_two)
   end
 
   def create_players(type_game)
