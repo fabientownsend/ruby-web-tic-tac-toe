@@ -1,6 +1,6 @@
-require 'web_player'
 require 'computer'
-require 'game_types'
+require 'marks'
+require 'web_player'
 
 class PlayersFactory
   def initialize(board, user_input)

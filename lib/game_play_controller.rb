@@ -14,6 +14,7 @@
         @game.current_player.new_move?
         @game.play
       rescue OccupiedPositionError
+      rescue OutOfRangeError
       rescue
       end
     end

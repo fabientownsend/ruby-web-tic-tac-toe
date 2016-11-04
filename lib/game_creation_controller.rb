@@ -1,6 +1,7 @@
-require 'players_factory'
-require 'game'
 require 'cgi'
+require 'game'
+require 'game_types'
+require 'players_factory'
 
 class GameCreationController
 

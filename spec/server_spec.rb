@@ -1,8 +1,9 @@
-require 'board'
 require 'rack/test'
 require 'rspec'
-require 'server'
 require 'spec_helper'
+
+require 'board'
+require 'server'
 require 'web_player'
 
 RSpec.describe Server do

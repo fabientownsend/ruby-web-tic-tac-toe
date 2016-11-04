@@ -12,7 +12,7 @@ class HTMLBuilder
     <form action='reset'><input type='submit' value='Reset'/></form></body></html>"
   end
 
-  def game_types(selected = nil)
+  def game_types(selected)
     @list_game_types = "<form action='menu'><select name='menu'>"\
       + create_list(selected)\
       + "</select><input type='submit' value='type game'/></form>"
