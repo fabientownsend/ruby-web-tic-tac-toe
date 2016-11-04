@@ -9,8 +9,13 @@
 
     def action(env)
       @game = @game_creator.game
-      game.current_player.new_move?
-      game.play
+
+      begin
+        @game.current_player.new_move?
+        @game.play
+      rescue OccupiedPositionError
+      rescue
+      end
     end
 
     def response
