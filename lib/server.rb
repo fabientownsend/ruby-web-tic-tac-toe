@@ -21,12 +21,16 @@ class Server
   def call(env)
     @env = env
 
-    controller_for(path(env)).action(env)
+    controller_for(path).action(env)
 
-    ['200', {'Content-Type' => 'text/html'}, [controller_for(path(env)).response]]
+    ['200', {'Content-Type' => 'text/html'}, [controller_for(path).response]]
   end
 
   private
+
+  def path
+    env["PATH_INFO"]
+  end
 
   def controller_for(path)
     case path
