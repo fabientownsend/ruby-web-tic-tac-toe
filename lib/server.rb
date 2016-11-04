@@ -28,10 +28,6 @@ class Server
 
   private
 
-  def path(env)
-    env["PATH_INFO"]
-  end
-
   def controller_for(path)
     case path
     when '/'
