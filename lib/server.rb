@@ -1,74 +1,49 @@
-require 'board'
-require 'cgi'
-require 'computer'
-require 'game'
-require 'html_builder'
 require 'rack'
-require 'web_player'
+
+require 'board'
+require 'error_controller'
+require 'game'
+require 'game_creation_controller'
+require 'game_play_controller'
+require 'html_builder'
 
 class Server
   attr_reader :env
 
-  def initialize(computer = false)
+  def initialize
+    @html = HTMLBuilder.new
     @board = Board.new
-    @web_player_one = WebPlayer.new(Mark::CROSS, self)
-    @vs_computer = computer
-
-    if (@vs_computer)
-      @web_player_two = Computer.new(Mark::ROUND, @board)
-    else
-      @web_player_two = WebPlayer.new(Mark::ROUND, self)
-    end
-
-    @game = Game.new(@board, @web_player_one, @web_player_two)
+    @game_creation_controller = GameCreationController.new(self, @board, @html)
+    @game_play_controller = GamePlayController.new(@game_creation_controller, @board, @html)
+    @error_controller = ErrorController.new
   end
 
   def call(env)
     @env = env
 
-    path = env["PATH_INFO"]
+    controller_for(path).action(env)
 
-    if (path == "/" || path == "/reset")
-      initialize(@vs_computer)
-    elsif (path == "/move")
-      play
-    end
-
-    html = HTMLBuilder.generate_page(generate_message(path), HTMLBuilder.board(@board.board))
-    ['200', {'Content-Type' => 'text/html'}, [html]]
+    ['200', {'Content-Type' => 'text/html'}, [controller_for(path).response]]
   end
 
   private
 
-  def generate_message(path)
-    message = ""
-
-    if (path == "/move")
-      message += message_move
-    elsif (path == "/" || path == "/reset")
-      message += "Start game"
-    else
-      message += "Are you lost?"
-    end
-
-    message
+  def path
+    env["PATH_INFO"]
   end
 
-  def message_move
-    if (@game.over? && @game.winner.empty?)
-      "Game Over - It's a tie"
-    elsif (@game.over?)
-      "Game Over - The winner is #{@game.winner}"
+  def controller_for(path)
+    case path
+    when '/'
+      @game_creation_controller
+    when '/reset'
+      @game_creation_controller
+    when '/menu'
+      @game_creation_controller
+    when '/move'
+      @game_play_controller
     else
-      "#{@game.current_player.mark} turn"
-    end
-  end
-
-  def play
-    begin
-      @game.current_player.new_move?
-      @game.play
-    rescue
+      @error_controller
     end
   end
 end
