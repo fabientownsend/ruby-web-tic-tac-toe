@@ -1,29 +1,33 @@
 class HTMLBuilder
-  attr_accessor :message
 
-  def generate_board(board)
-    @my_board = "<table><tbody>" + create_line(board) + "</tbody></table>"
-  end
-
-  def generate_page
-    "<!doctype html><html lang=''><head><meta charset='utf-8'><title></title>
-    #{css}</head><body>#{@list_game_types}
-    <h1>Tic-Tac-Toe</h1><p>#{message}</p><div id='board'>#{@my_board}</div>
-    <form action='reset'><input type='submit' value='Reset'/></form></body></html>"
-  end
-
-  def game_types(selected)
-    @list_game_types = "<form action='menu'><select name='menu'>"\
-      + create_list(selected)\
-      + "</select><input type='submit' value='type game'/></form>"
+  def create(args = {})
+    update_informations(args)
+    content = menu_game_type + game_status + create_board + reset_button
+    header + body(content)
   end
 
   private
 
-  attr_accessor :board
+  attr_reader :message, :board, :current_game_type
 
-  def create_list(selected)
-    TYPES.map { |value, menu| create_option(selected, value, menu) }.join
+  def update_informations(args = defaults)
+    args = defaults.merge(args)
+
+    @board = args[:board]
+    @message = args[:message]
+    @current_game_type = args[:current_game_type]
+  end
+
+  def defaults
+    { :message => "default", :board => [], :current_game_type => TYPES.keys.first}
+  end
+
+  def game_status
+    "<p>#{message}</p>"
+  end
+
+  def reset_button
+    "<form action='reset'><input type='submit' value='Reset'/></form>"
   end
 
   TYPES = {
@@ -32,21 +36,40 @@ class HTMLBuilder
     "computer_vs_computer" => "Computer vs. Computer"
   }
 
-  def create_option(selected, value, menu)
-    if (selected == value)
-      "<option value='#{value}' selected='selected'>#{menu}</option>"
+  def menu_game_type
+    "<form action='menu'><select name='menu'>"\
+      + creat_options\
+      + "</select><input type='submit' value='type game'/></form>"
+  end
+
+  def creat_options
+    TYPES.map { |game_type_value, menu| create_option(game_type_value, menu) }.join
+  end
+
+  def create_option(game_type_value, menu)
+    if (current_game_type == game_type_value)
+      "<option value='#{game_type_value}' selected='selected'>#{menu}</option>"
     else
-      "<option value='#{value}'>#{menu}</option>"
+      "<option value='#{game_type_value}'>#{menu}</option>"
     end
   end
 
-  def create_line(board)
-    board.map { |lines| "<tr>" + create_cells(lines) + "</tr>" }.join
+  def create_board
+    "<table><tbody>" + create_board_lines + "</tbody></table>"
   end
 
-  def create_cells(lines)
-    lines.map { |spot|
-      "<td><a class='spot_link' href='/move?number=#{spot}'> #{spot} </a></td>" }.join
+  def create_board_lines
+    board.map { |line| "<tr>" + create_line_cells(line) + "</tr>" }.join
+  end
+
+  def create_line_cells(line)
+    line.map { |cell_id|
+      "<td><a class='spot_link' href='/move?number=#{cell_id}'> #{cell_id} </a></td>" }.join
+  end
+
+  def header
+    "<!doctype html><html lang=''><head><meta charset='utf-8'><title></title>\
+    #{css}</head>"
   end
 
   def css
@@ -57,5 +80,9 @@ class HTMLBuilder
     .spot_link { display: block; height: 100px; line-height: 100px; }
     a { text-decoration: none; color: #fff; }
     </style>"
+  end
+
+  def body(content = "")
+    "<body>#{content}</body></html>"
   end
 end

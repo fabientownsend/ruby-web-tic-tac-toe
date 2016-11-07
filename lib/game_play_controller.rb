@@ -1,10 +1,9 @@
   class GamePlayController
 
-    def initialize(game_creator, board, html)
+    def initialize(game_creator, board)
       @game_creator = game_creator
       @game = game_creator.game
       @board = board
-      @html = html
     end
 
     def action(env)
@@ -17,19 +16,21 @@
       rescue OutOfRangeError
       rescue
       end
-    end
 
-    def response
-      html.generate_board(board.content)
-      html.message = game_status
-      html.generate_page
+      response
     end
 
     private
 
-    attr_accessor :html
     attr_reader :board
     attr_reader :game
+
+    def response
+      {
+        :board => board.content,
+        :message => game_status
+      }
+    end
 
     def game_status
       return "Game Over - It's a tie" if (game.over? && game.winner.empty?)

@@ -1,13 +1,13 @@
   class ErrorController
-    def update(one, two, three, html)
-      @game = three
+    def action(env)
+      response
     end
 
-    def action(env)
-      @game
-    end
+    private
 
     def response
-      "error 404"
+      {
+        :message => "error 404"
+      }
     end
   end
