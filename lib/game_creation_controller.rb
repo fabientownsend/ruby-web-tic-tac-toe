@@ -7,13 +7,13 @@ class GameCreationController
 
   attr_reader :game
 
-  def initialize(event, board)
-    @event = event
+  def initialize(web_io, board)
+    @web_io = web_io
     @board = board
     @type_game = GAME_TYPES::HUMAN_VS_HUMAN
     @current_status = "Start game"
 
-    create_game(@type_game)
+    create_new_game(@type_game)
   end
 
   def action(env)
@@ -25,7 +25,7 @@ class GameCreationController
       @type_game = parsed_type_game
     end
 
-    create_game(@type_game)
+    create_new_game(@type_game)
 
     if @type_game == GAME_TYPES::COMPUTER_VS_COMPUTER
       @game.play
@@ -37,7 +37,7 @@ class GameCreationController
 
   private
 
-  attr_reader :event
+  attr_reader :web_io
   attr_accessor :board
   attr_accessor :current_status
 
@@ -61,7 +61,7 @@ class GameCreationController
     values["menu"].first
   end
 
-  def create_game(type_game)
+  def create_new_game(type_game)
     players = create_players(type_game)
     @game = Game.new(
       :board => board,
@@ -70,7 +70,7 @@ class GameCreationController
   end
 
   def create_players(type_game)
-    factory = PlayersFactory.new(board, event)
+    factory = PlayersFactory.new(board, web_io)
 
     return factory.create_human_and_computer_players if (type_game == GAME_TYPES::HUMAN_VS_COMPUTER)
     return factory.create_computer_players if (type_game == GAME_TYPES::COMPUTER_VS_COMPUTER)

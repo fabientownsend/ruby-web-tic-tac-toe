@@ -1,20 +1,17 @@
   class GamePlayController
 
-    def initialize(game_creator, board)
-      @game_creator = game_creator
-      @game = game_creator.game
+    def initialize(game, board)
+      @game = game
       @board = board
     end
 
     def action(env)
-      @game = @game_creator.game
-
       begin
-        @game.current_player.new_move?
-        @game.play
+        game.current_player.update_status_move
+        game.play
       rescue OccupiedPositionError
       rescue OutOfRangeError
-      rescue
+      rescue ArgumentError
       end
 
       response

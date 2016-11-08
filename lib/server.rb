@@ -2,10 +2,10 @@ require 'rack'
 
 require 'board'
 require 'error_controller'
-require 'game'
 require 'game_creation_controller'
 require 'game_play_controller'
 require 'html_builder'
+require 'game'
 
 class Server
   attr_reader :env
@@ -14,7 +14,7 @@ class Server
     @html = HTMLBuilder.new
     @board = Board.new
     @game_creation_controller = GameCreationController.new(self, @board)
-    @game_play_controller = GamePlayController.new(@game_creation_controller, @board)
+    @game_play_controller = GamePlayController.new(@game_creation_controller.game, @board)
     @error_controller = ErrorController.new
   end
 
