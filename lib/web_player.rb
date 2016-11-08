@@ -15,7 +15,7 @@ class WebPlayer
     get_move
   end
 
-  def new_move?
+  def update_status_move
     @ready = true if @move != get_move
   end
 
