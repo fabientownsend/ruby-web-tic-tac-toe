@@ -18,7 +18,13 @@ class GameCreationController
 
   def action(env)
     board.reset
-    @type_game = parse_type_game(env) if parse_type_game(env) != nil
+
+    parsed_type_game = parse_type_game(env)
+
+    if parsed_type_game != nil
+      @type_game = parsed_type_game
+    end
+
     create_game(@type_game)
 
     if @type_game == GAME_TYPES::COMPUTER_VS_COMPUTER
