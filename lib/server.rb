@@ -13,17 +13,17 @@ class Server
   def initialize
     @html = HTMLBuilder.new
     @board = Board.new
-    @game_creation_controller = GameCreationController.new(self, @board, @html)
-    @game_play_controller = GamePlayController.new(@game_creation_controller, @board, @html)
+    @game_creation_controller = GameCreationController.new(self, @board)
+    @game_play_controller = GamePlayController.new(@game_creation_controller, @board)
     @error_controller = ErrorController.new
   end
 
   def call(env)
     @env = env
 
-    controller_for(path).action(env)
+    response = controller_for(path).action(env)
 
-    ['200', {'Content-Type' => 'text/html'}, [controller_for(path).response]]
+    ['200', {'Content-Type' => 'text/html'}, [@html.create(response)]]
   end
 
   private

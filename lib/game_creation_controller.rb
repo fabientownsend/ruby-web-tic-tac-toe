@@ -7,35 +7,48 @@ class GameCreationController
 
   attr_reader :game
 
-  def initialize(event, board, html)
+  def initialize(event, board)
     @event = event
     @board = board
-    @html = html
     @type_game = GAME_TYPES::HUMAN_VS_HUMAN
+    @current_status = "Start game"
 
     create_game(@type_game)
   end
 
   def action(env)
     board.reset
-    @type_game = parse_type_game(env) if parse_type_game(env) != nil
-    create_game(@type_game)
-    @game.play if @type_game == GAME_TYPES::COMPUTER_VS_COMPUTER
-  end
 
-  def response
-    html.game_types(@type_game)
-    html.generate_board(board.content)
-    html.message = "Start game"
-    html.message = game_status if @type_game == GAME_TYPES::COMPUTER_VS_COMPUTER
-    html.generate_page
+    parsed_type_game = parse_type_game(env)
+
+    if parsed_type_game != nil
+      @type_game = parsed_type_game
+    end
+
+    create_game(@type_game)
+
+    if @type_game == GAME_TYPES::COMPUTER_VS_COMPUTER
+      @game.play
+      @current_status = game_status
+    end
+
+    response
   end
 
   private
 
   attr_reader :event
-  attr_accessor :html
   attr_accessor :board
+  attr_accessor :current_status
+
+  def response
+    {
+      :message => current_status,
+      :current_game_type => @type_game,
+      :board => board.content
+    }
+  end
+
 
   def game_status
     return "Game Over - It's a tie" if (game.over? && game.winner.empty?)
